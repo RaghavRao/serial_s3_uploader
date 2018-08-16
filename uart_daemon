@@ -1,0 +1,87 @@
+#!/usr/bin/python
+#TODO make inatance_arg  3 instances for 3 UART ports
+#TODO make separate uploader daemon
+#print "Importing boto3..."
+import boto3
+import serial
+import socket
+import fcntl
+import struct
+import argparse
+import datetime
+import netifaces
+import apscheduler
+from time import sleep
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--type")
+#help="Daemon Type: gps, gpr, ard")
+#parser.add_argument("-p", "--path", help="Path to serial input from arduino")
+#parser.add_argument("-f", "--file", help="Path to output file")
+args = parser.parse_args()
+
+print args.type
+'''
+valid_types = ["gps", "gpr", "ard"]
+print args.type
+
+if args.path:
+    DIR = args.path
+else:
+    DIR = "/dev/pts/3"
+
+if args.file:
+    FILE = args.file
+else:
+    FILE = "/home/raghav/arduino/serial_arduino_data.txt"
+
+BAUD = 115200
+ser = serial.Serial(DIR, BAUD)
+BUCKET = "lakewood-gpr"
+
+print "Getting S3 buckets..."
+s3_service = boto3.resource('s3')
+bucket = s3_service.Bucket(BUCKET)
+
+for object in bucket.objects.all():
+    print "File Found", object.key
+
+print "Opening output file ./serial_arduino_data.txt"
+f=open(FILE, "a+")
+
+print "Waiting for serial data on", DIR
+
+def interface_up(interface):
+    addr = netifaces.ifaddresses(interface)
+    return netifaces.AF_INET in addr
+
+#find wlan interfaces
+wlan_name = ""
+for iface in netifaces.interfaces():
+    if iface.startswith('wl'):
+        print "Found wlan interface", iface
+        wlan_name = iface
+
+
+
+while 1:
+    try:
+        if ser.in_waiting > 0:
+            line = ser.readline()
+            print line
+            f.write(line)
+    except (IOError, KeyboardInterrupt, SystemExit):
+        print "\n", "Closing out file", FILE
+        f.close()
+        if interface_up(wlan_name):
+            print "Connected to internet"
+            print "Uploading", FILE, "to s3 bucket: lakewood-gpr"
+            s3_client = boto3.client('s3')
+            filename = 'serial_arduino_data.txt'
+            s3_client.upload_file(filename, BUCKET, filename)
+        else: 
+            print "Disconnected"
+        exit()
+
+
+'''
